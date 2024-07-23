@@ -1,0 +1,17 @@
+{
+  "name": "movieflix-api",
+  "version": "1.0.0",
+  "description": "Projeto de backend: criando do zero uma API que agrupa filmes e séries",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tsx watch src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4"
+  }
+}
