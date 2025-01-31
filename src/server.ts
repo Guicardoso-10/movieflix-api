@@ -54,8 +54,7 @@ app.post("/movies", async (req, res) => {
     res.status(201).send()
 })
 
-app.put("/movies/:id", async (req, res) => {
-    //pegar o id do registro que será atualizado, convertê-lo de string para inteiro, 
+app.put("/movies/:id", async (req, res) => { 
     const id = Number(req.params.id)
 
     try {
@@ -105,6 +104,29 @@ app.delete("/movies/:id", async (req, res) => {
         res.status(500).send({ message: "Não foi possível remover o filme" })
     }
 
+})
+
+app.get("/movies/:genreName", async (req, res) => {
+    try {
+        const moviesFilteresByGenreName = await prisma.movie.findMany({
+            include: {
+                genres: true,
+                languages: true
+            },
+            where: {
+                genres: {
+                    genre: {
+                        equals: req.params.genreName,
+                        mode: "insensitive"
+                    }
+                }
+            }
+        })
+        
+        res.status(200).send(moviesFilteresByGenreName)
+    } catch (error) {
+        res.status(500).send({message: "Erro ao filtrar filmes por gênero"})
+    }
 })
 
 
