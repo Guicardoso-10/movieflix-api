@@ -38,7 +38,7 @@ app.post("/movies", async (req, res) => {
         })
 
         if (movieWithTheSameTitle) {
-            return res.status(409).send({ message: "Já existe um filme cadastrado com esse título" })
+            return res.status(404).send({ message: "Já existe um filme cadastrado com esse título" })
         }
 
         await prisma.movie.create({
@@ -51,7 +51,7 @@ app.post("/movies", async (req, res) => {
             }
         })
     } catch (error) {
-        return res.status(500).send({ message: "Falha ao cadastrar um filme" })
+        return res.status(500).send({ message: "Falha ao cadastrar o filme" })
     }
 
     res.status(201).send()
