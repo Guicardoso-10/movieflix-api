@@ -8,7 +8,9 @@
     "paths": {
         "/movies": {
             "get": {
-                "tags": ["Movie"],
+                "tags": [
+                    "Movie"
+                ],
                 "summary": "Obter todos os filmes",
                 "responses": {
                     "200": {
@@ -27,7 +29,9 @@
                 }
             },
             "post": {
-                "tags": ["MovieInput"],
+                "tags": [
+                    "MovieInput"
+                ],
                 "summary": "Cadastrar um novo filme",
                 "requestBody": {
                     "required": true,
@@ -54,7 +58,9 @@
         },
         "/movies/{id}": {
             "put": {
-                "tags": ["Movie"],
+                "tags": [
+                    "Movie"
+                ],
                 "summary": "Atualizar um filme",
                 "parameters": [
                     {
@@ -82,7 +88,7 @@
                         "description": "Filme atualizado com sucesso"
                     },
                     "404": {
-                        "description": "Filme não encontrado"                        
+                        "description": "Filme não encontrado"
                     },
                     "500": {
                         "description": "Falha ao atualizar o registro do filme"
@@ -90,7 +96,9 @@
                 }
             },
             "delete": {
-                "tags": ["Movie"],
+                "tags": [
+                    "Movie"
+                ],
                 "summary": "Remover um filme",
                 "parameters": [
                     {
@@ -108,7 +116,7 @@
                         "description": "Filme removido com sucesso"
                     },
                     "404": {
-                        "description": "Filme não encontrado"                        
+                        "description": "Filme não encontrado"
                     },
                     "500": {
                         "description": "Falha ao remover o filme"
@@ -118,7 +126,9 @@
         },
         "/movies/{genreName}": {
             "get": {
-                "tags": ["Movie"],
+                "tags": [
+                    "Movie"
+                ],
                 "summary": "Filtrar filmes por gênero",
                 "parameters": [
                     {
@@ -146,6 +156,44 @@
                     },
                     "500": {
                         "description": "Falha ao filtrar filmes por gênero"
+                    }
+                }
+            }
+        },
+        "/genres/{id}": {
+            "put": {
+                "tags": ["Genre"],
+                "summary": "Atualizar um gênero",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "id do gênero a ser atualizado",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Genre"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Filme atualizado com sucesso"
+                    },
+                    "404": {
+                        "description": "Filme não encontrado"
+                    },
+                    "500": {
+                        "description": "Falha ao atualizar o registro do filme"
                     }
                 }
             }
@@ -239,6 +287,16 @@
                         "type": "string",
                         "format": "date",
                         "description": "número de oscars que o filme ganhou"
+                    }
+                }
+            },
+            "Genre": {
+                "type": "object",
+                "required": "genre",
+                "properties": {
+                    "genre": {
+                        "type": "string",
+                        "description": "Nome do gênero"
                     }
                 }
             }

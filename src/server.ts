@@ -4,6 +4,7 @@ import swaggerUi from "swagger-ui-express";
 import swaggerDocument from '../swagger.json'
 
 
+
 const port = 3000
 const app = express()
 const prisma = new PrismaClient()
@@ -130,6 +131,36 @@ app.get("/movies/:genreName", async (req, res) => {
     } catch (error) {
         res.status(500).send({message: "Erro ao filtrar filmes por gênero"})
     }
+})
+
+app.put("/genres/:id", async (req, res) => {
+    const id = Number(req.params.id)
+    const genreCheck = await prisma.genre.findUnique({
+        where: { 
+            id: id
+        }
+    })
+
+    if (!genreCheck) {
+        return res.status(404).send({message: "Gênero não encontrado"})
+    }
+
+    try {
+        await prisma.genre.update({
+            where: {
+                id: id
+            },
+            data: {
+                genre: req.body.genre
+            }
+        })
+    
+        res.status(200).send({message: "Gênero atualizado com sucesso"})
+    } catch (error) {
+        res.status(500).send({message: "Falha ao atualizar o gênero"})
+    }
+
+    
 })
 
 
