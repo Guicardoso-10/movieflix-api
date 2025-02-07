@@ -160,10 +160,62 @@
                 }
             }
         },
+        "/genres": {
+            "get": {
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Obter todos os gêneros",
+                "responses": {
+                    "200": {
+                        "description": "Retorna uma lista de gêneros",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Genre"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "GenreInput"
+                ],
+                "summary": "Cadastrar um novo gênero",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GenreInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Gênero cadastrado com sucesso"
+                    },
+                    "404": {
+                        "description": "Esse gênero já se encontra cadastrado"
+                    },
+                    "500": {
+                        "description": "Falha ao cadastrar o gênero"
+                    }
+                }
+            }
+        },
         "/genres/{id}": {
             "put": {
-                "tags": ["Genre"],
-                "summary": "Atualizar um gênero",
+                "tags": [
+                    "Genre"
+                ],
+                "summary": "Atualizar um filme",
                 "parameters": [
                     {
                         "name": "id",
@@ -180,20 +232,20 @@
                     "content": {
                         "application/json": {
                             "schema": {
-                                "$ref": "#/components/schemas/Genre"
+                                "$ref": "#/components/schemas/GenreInput"
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "Filme atualizado com sucesso"
+                        "description": "Gênero atualizado com sucesso"
                     },
                     "404": {
-                        "description": "Filme não encontrado"
+                        "description": "Gênero não encontrado"
                     },
                     "500": {
-                        "description": "Falha ao atualizar o registro do filme"
+                        "description": "Falha ao atualizar o gênero"
                     }
                 }
             }
@@ -269,34 +321,47 @@
                 "properties": {
                     "title": {
                         "type": "string",
-                        "description": "título do filme"
+                        "description": "Título do filme"
                     },
                     "genre_id": {
                         "type": "integer",
-                        "description": "id do gênero do filme"
+                        "description": "ID do gênero do filme"
                     },
                     "lang_id": {
                         "type": "integer",
-                        "description": "id do idioma do filme"
+                        "description": "ID do idioma do filme"
                     },
                     "oscar_count": {
                         "type": "integer",
-                        "description": "número de oscars que o filme ganhou"
+                        "description": "Número de oscars que o filme ganhou"
                     },
                     "release_date": {
                         "type": "string",
                         "format": "date",
-                        "description": "número de oscars que o filme ganhou"
+                        "description": "Data de lançamento do filme"
                     }
                 }
             },
             "Genre": {
                 "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "description": "número identificador do filme"
+                    },
+                    "genre": {
+                        "type": "string",
+                        "description": "nome do gênero"
+                    }
+                }
+            },
+            "GenreInput": {
+                "type": "object",
                 "required": "genre",
                 "properties": {
                     "genre": {
                         "type": "string",
-                        "description": "Nome do gênero"
+                        "description": "nome do gênero"
                     }
                 }
             }

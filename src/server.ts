@@ -133,6 +133,15 @@ app.get("/movies/:genreName", async (req, res) => {
     }
 })
 
+app.get("/genres", async (_, res) => {
+    const genres = await prisma.genre.findMany({
+        orderBy: {
+            genre: "asc"
+        }
+    })
+    res.json(genres)
+})
+
 app.put("/genres/:id", async (req, res) => {
     const id = Number(req.params.id)
     const genreCheck = await prisma.genre.findUnique({
@@ -161,6 +170,32 @@ app.put("/genres/:id", async (req, res) => {
     }
 
     
+})
+
+app.post("/genres", async (req, res) => {
+    const { genre } = req.body
+
+    try {
+        const genreWithTheSameTitle = await prisma.genre.findFirst({
+            where: {
+                genre: { equals: genre, mode: "insensitive" }
+            }
+        })
+
+        if (genreWithTheSameTitle) {
+            return res.status(404).send({ message: "Esse gênero já se encontra cadastrado." })
+        }
+        
+        await prisma.genre.create({
+            data: {
+                genre: genre
+            }
+        })
+    
+        res.status(201).send({message: "Gênero cadastrado com sucesso."})
+    } catch (error) {
+        return res.status(500).send({message: "Falha ao cadastrar o gênero."})
+    }
 })
 
 
