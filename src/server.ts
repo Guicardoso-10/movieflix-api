@@ -1,7 +1,8 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from '../swagger.json'
+
 
 const port = 3000
 const app = express()
@@ -10,12 +11,23 @@ const prisma = new PrismaClient()
 app.use(express.json())
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
-app.get("/movies", async (_, res) => {
+app.get("/movies/sort", async (req, res) => {
+    const { sort } = req.query
+    console.log(`Sort recebido: ${sort}`)
+
     const moviesCounter = await prisma.movie.count()
+    
+    //validação do sort
+    const sortOption = sort === "title" || sort === "release_date" ? sort : "title"
+
+    let orderBy: Prisma.MovieOrderByWithRelationInput = 
+        sortOption === "release_date"
+            ? {release_date: {sort: "asc", nulls: "last"}}
+            : {title: "asc"}
+    
+
     const movieList = await prisma.movie.findMany({
-        orderBy: {
-            title: "asc"
-        },
+        orderBy,
         include: {
             genres: true,
             languages: true

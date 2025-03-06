@@ -6,21 +6,46 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/movies": {
+        "/movies/sort": {
             "get": {
                 "tags": [
                     "Movie"
                 ],
-                "summary": "Obter todos os filmes",
+                "summary": "Obter todos os filmes com ordenação",
+                "parameters": [
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "required": false,
+                        "description": "Critério de ordenação. Valores permitidos: 'title' ou 'release_date'. Caso não seja informado, o critério utilizado será 'title'",
+                        "schema": {
+                            "type": "string",
+                            "enum": ["title", "release_date"]
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Retorna uma lista de filmes",
+                        "description": "Retorna uma lista de filmes, informando também o total de filmes e média de duração em minutos.",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Movie"
+                                    "type": "object",
+                                    "properties": {
+                                        "totalDeFilmes": {
+                                            "type": "integer",
+                                            "description": "total de filmes cadastrados"
+                                        },
+                                        "duracaoMedia": {
+                                            "type": "string",
+                                            "description": "média de duração em minutos"
+                                        },
+                                        "filmes": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Movie"
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -33,6 +58,17 @@
                     "MovieInput"
                 ],
                 "summary": "Cadastrar um novo filme",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "required": true,
+                        "description": "número identificador do filme",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
