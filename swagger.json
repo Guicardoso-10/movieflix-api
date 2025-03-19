@@ -11,7 +11,7 @@
                 "tags": [
                     "Movie"
                 ],
-                "summary": "Obter todos os filmes com ordenação",
+                "summary": "Obter todos os filmes com ordenação e filtragem por idioma",
                 "parameters": [
                     {
                         "name": "sort",
@@ -22,11 +22,20 @@
                             "type": "string",
                             "enum": ["title", "release_date"]
                         }
+                    },
+                    {
+                        "name": "language",
+                        "in": "query",
+                        "required": false,
+                        "description": "Idioma a partir do qual os filmes serão filtrados. Algumas opções são Inglês, Português e Italiano",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Retorna uma lista de filmes, informando também o total de filmes e média de duração em minutos.",
+                        "description": "Retorna uma lista de filmes ordenada e filtrada conforme os parâmetros especificados, informando também o total de filmes e média de duração em minutos.",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -50,6 +59,12 @@
                                 }
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Erro devido aos parâmetros estarem inválidos"
+                    },
+                    "500": {
+                        "description": "Erro interno ao listar os filmes"
                     }
                 }
             },

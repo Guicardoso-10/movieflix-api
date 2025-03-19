@@ -255,6 +255,43 @@ app.delete("/genres/:id", async (req, res) => {
     }
 })
 
+app.get("/movies", async (req, res) => {
+    try {
+        const {language} = req.query
+
+        if (!language) {
+            return res.status(400).send({message: "O parâmetro 'language' é obrigatório"})
+        }
+
+        //Buscar os IDs dos idiomas correspondentes
+        const languagesIds = await prisma.language.findMany ({
+            where: {language: {equals: language as string, mode: "insensitive"}},
+            select: {id: true}
+        })
+
+        //Extrair os IDs corretamente
+        const ids = languagesIds.map(lang => lang.id)
+
+        //Buscar os filmes com base nos ids encontrados
+        const moviesFilteredByLanguage = await prisma.movie.findMany({
+            where: {
+                lang_id: {
+                    in: ids.length > 0 ? ids : [-1] //se não houver correspondência, evita erro
+                }
+            },
+            include: {
+                genres: true,
+                languages: true
+            }
+        })
+
+        res.status(200).send(moviesFilteredByLanguage)
+    } catch(error) {
+        console.log(error)
+        res.status(500).send({message: "Erro ao filtrar os filmes por gênero"})
+    }
+})
+
 
 app.listen(port, () => {
     console.log(`Servidor em execução na porta ${port}`)
