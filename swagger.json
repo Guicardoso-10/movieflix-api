@@ -29,7 +29,8 @@
                         "required": false,
                         "description": "Idioma a partir do qual os filmes serão filtrados. Algumas opções são Inglês, Português e Italiano",
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "enum": ["Inglês", "Português", "Francês", "Italiano", "Turco"]
                         }
                     }
                 ],
