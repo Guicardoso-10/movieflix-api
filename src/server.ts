@@ -11,49 +11,65 @@ const prisma = new PrismaClient()
 app.use(express.json())
 app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 
-app.get("/movies/sort", async (req, res) => {
-    const { sort } = req.query
-    console.log(`Sort recebido: ${sort}`)
+app.get("/movies", async (req, res) => {
+    try {
+        const { genre, language, sort } = req.query
 
-    const moviesCounter = await prisma.movie.count()
-    
-    //validação do sort
-    const sortOption = sort === "title" || sort === "release_date" ? sort : "title"
+        
 
-    let orderBy: Prisma.MovieOrderByWithRelationInput = 
-        sortOption === "release_date"
-            ? {release_date: {sort: "asc", nulls: "last"}}
-            : {title: "asc"}
-    
+        //Filtragem por gênero e idioma
+        let whereClause: any = {}
 
-    const movieList = await prisma.movie.findMany({
-        orderBy,
-        include: {
-            genres: true,
-            languages: true
-        }
-    })
-
-    function calculateAverageDuration () {
-        let total = 0
-        let average = 0
-
-        for (let i = 0; i < movieList.length; i++) {
-            total += movieList[i].minutes
+        if (genre) {
+            whereClause.genres = {
+                some: {genre: {equals: genre as string, mode: "insensitive"}}
+            }
         }
 
-        average = Math.round(total/moviesCounter)
+        if (language) {
+            whereClause.lang_id = {
+                in: await prisma.language.findMany ({
+                    where: {language: {equals: language as string, mode: "insensitive"}},
+                    select: {id: true}
+                }).then(langs => langs.map(lang => lang.id))
+            }
+        }
 
-        return average
+        //Contar o total de filmes
+        const totalDeFilmes = await prisma.movie.count({where: whereClause})
+
+        //Definir ordenação
+        let orderByClause: any = {}
+        if (sort === "title") orderByClause.title = "asc"
+        else if (sort === "release_date") orderByClause.release_date = "asc"
+
+
+        //Buscar filmes no banco com filtros e ordenação
+        const movieList = await prisma.movie.findMany({
+            where: whereClause,
+            orderBy: orderByClause,
+            include: {
+                genres: true,
+                languages: true
+            }
+        })
+
+        //Calcular a média de duração dos filmes
+        const totalDuration = movieList.reduce((sum, movie) => sum + movie.minutes, 0)
+        const duracaoMedia = totalDeFilmes > 0 ? (totalDuration / totalDeFilmes).toFixed(2) : "0"
+
+        //Retornar resposta JSON
+        res.status(200).json({
+            totalDeFilmes,
+            duracaoMedia: `${duracaoMedia} minutos`,
+            filmes: movieList
+        })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: "Erro ao buscar filmes"})
     }
-
-    const averageDuration = calculateAverageDuration()
-
-    res.json({
-        totalDeFilmes: moviesCounter,
-        duracaoMedia: `${averageDuration} minutos`,
-        filmes: movieList
-    })
+        
 })
 
 app.post("/movies", async (req, res) => {
@@ -254,44 +270,6 @@ app.delete("/genres/:id", async (req, res) => {
         res.status(500).send({message: "Falha ao deletar o gênero"})
     }
 })
-
-app.get("/movies", async (req, res) => {
-    try {
-        const {language} = req.query
-
-        if (!language) {
-            return res.status(400).send({message: "O parâmetro 'language' é obrigatório"})
-        }
-
-        //Buscar os IDs dos idiomas correspondentes
-        const languagesIds = await prisma.language.findMany ({
-            where: {language: {equals: language as string, mode: "insensitive"}},
-            select: {id: true}
-        })
-
-        //Extrair os IDs corretamente
-        const ids = languagesIds.map(lang => lang.id)
-
-        //Buscar os filmes com base nos ids encontrados
-        const moviesFilteredByLanguage = await prisma.movie.findMany({
-            where: {
-                lang_id: {
-                    in: ids.length > 0 ? ids : [-1] //se não houver correspondência, evita erro
-                }
-            },
-            include: {
-                genres: true,
-                languages: true
-            }
-        })
-
-        res.status(200).send(moviesFilteredByLanguage)
-    } catch(error) {
-        console.log(error)
-        res.status(500).send({message: "Erro ao filtrar os filmes por gênero"})
-    }
-})
-
 
 app.listen(port, () => {
     console.log(`Servidor em execução na porta ${port}`)

@@ -6,7 +6,7 @@
         "version": "1.0.0"
     },
     "paths": {
-        "/movies/sort/language": {
+        "/movies": {
             "get": {
                 "tags": [
                     "Movie"
@@ -27,7 +27,7 @@
                         "name": "language",
                         "in": "query",
                         "required": false,
-                        "description": "Idioma a partir do qual os filmes serão filtrados. Algumas opções são Inglês, Português e Italiano",
+                        "description": "Idioma a partir do qual os filmes serão filtrados.",
                         "schema": {
                             "type": "string",
                             "enum": ["Inglês", "Português", "Francês", "Italiano", "Turco"]
@@ -60,9 +60,6 @@
                                 }
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Erro devido aos parâmetros estarem inválidos"
                     },
                     "500": {
                         "description": "Erro interno ao listar os filmes"
